@@ -1,27 +1,32 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, redirect, url_for
 
 app = Flask(__name__)
 
 # База даних користувачів
-users = []
+users_list = [
+    {'id': 1, 'name': 'Ньютон'},
+    {'id': 2, 'name': 'Кюрі'},
+    {'id': 3, 'name': 'Черчіль'}
+]
 
 # База даних товарів
-products = []
+products_list = [
+    {'id': 1, 'name': 'телефон', 'price': 800},
+    {'id': 2, 'name': 'рушниця', 'price': 6200},
+    {'id': 3, 'name': 'їжа', 'price': 100},
+    {'id': 3, 'name': 'набої', 'price': 50},
+    {'id': 3, 'name': 'стартовий пакет Київстар', 'price': 0},
+    {'id': 3, 'name': 'ноутбук', 'price': 40000}
+]
 
-
-# Роут для додавання нових користувачів
-@app.route("/add_user", methods=["POST"])
-def add_user():
-    user_data = request.get_json()
-    users.append(user_data)
-    return jsonify({"message": "User added successfully"})
+goods = []
 
 
 # Роут для додавання нових товарів
 @app.route("/add_product", methods=["POST"])
 def add_product():
     product_data = request.get_json()
-    products.append(product_data)
+    products_list.append(product_data)
     return jsonify({"message": "Product added successfully"})
 
 
@@ -29,7 +34,7 @@ def add_product():
 @app.route("/get_products_by_category", methods=["GET"])
 def get_products_by_category():
     category = request.args.get("category")
-    category_products = [product for product in products if product["category"] == category]
+    category_products = [product for product in products_list if product["category"] == category]
     return jsonify(category_products)
 
 
@@ -55,9 +60,34 @@ def place_order():
     return jsonify({"message": "Order placed successfully"})
 
 
-@app.route("/", methods=["GET"])
-def main_page():
-    return render_template("index.html")
+@app.route("/main", methods=["GET"])
+def main():
+    return render_template("main.html")
+
+
+@app.route("/users", methods=["GET"])
+def users():
+    return render_template("users.html", users=users_list)
+
+
+# Роут для додавання нових користувачів
+@app.route("/add_user", methods=["GET", "POST"])
+def add_user():
+    if request.method == 'POST':
+        new_user_name = request.form.get('user_name')
+        new_user = {'id': len(users_list) + 1, 'name': new_user_name}
+        users_list.append(new_user)
+        return redirect(url_for('users'))
+
+
+@app.route("/products", methods=["GET"])
+def products():
+    return render_template("products.html", products=products_list)
+
+
+@app.route("/cart", methods=["GET"])
+def cart():
+    return render_template("cart.html", goods=goods)
 
 
 if __name__ == "__main__":
