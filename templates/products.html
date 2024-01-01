@@ -6,18 +6,36 @@
     <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-light">
     <div class="col-md-5 p-lg-5 mx-auto my-5">
         <h1 class="display-4 fw-normal">Список товарів</h1>
+        <form method="get" action="{{ url_for('get_products_by_category') }}">
+            <label for="get_category">Категорія:</label>
+            <select id="get_category" name="get_category" required>
+                {% for category in categories %}
+                    <option value="{{ category }}">{{ category }}</option>
+                {% endfor %}
+            </select>
+        <button class="btn btn-outline-secondary" type="submit">Обрати</button>
+        </form>
         <ul class="lead fw-normal">
-        {% for product in products %}
-            <li><h4>{{ product.name }} -- {{ product.price }} грн.</h4></li>
-        {% endfor %}
-    </ul>
+{#        {% for category, _products in products.items() %}#}
+            {% for product in products %}
+                <li><h4>{{ product.name }} -- {{ product.price }} грн.</h4></li>
+            {% endfor %}
+            {#    {% endfor %}#}
+        </ul>
         <br>
     <h2>Додати нову одиницю товару</h2>
-    <form method="post" action="{{ url_for('add_user') }}">
-        <label for="user_name"> Назва товару: </label>
-        <input type="text" id="user_name" name="user_name" required>
-        <label for="user_name"> Назва товару: </label>
-        <input type="text" id="user_name" name="user_name" required>
+    <form method="post" action="{{ url_for('add_product') }}">
+        <label for="category">Категорія:</label>
+        <select id="category" name="category" required>
+            {% for category in categories[1:] %}
+                <option value="{{ category }}">{{ category }}</option>
+            {% endfor %}
+        </select>
+        <label for="product_name"> Назва товару: </label>
+        <input type="text" id="product_name" name="product_name" required>
+        <br>
+        <label for="product_price"> Ціна товару: </label>
+        <input type="text" id="product_price" name="product_price" required>
         <br>
         <button class="btn btn-outline-secondary" type="submit">Додати</button>
     </form>
