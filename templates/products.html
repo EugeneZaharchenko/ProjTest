@@ -16,11 +16,9 @@
         <button class="btn btn-outline-secondary" type="submit">Обрати</button>
         </form>
         <ul class="lead fw-normal">
-{#        {% for category, _products in products.items() %}#}
             {% for product in products %}
                 <li><h4>{{ product.name }} -- {{ product.price }} грн.</h4></li>
             {% endfor %}
-            {#    {% endfor %}#}
         </ul>
         <br>
     <h2>Додати нову одиницю товару</h2>
