@@ -1,9 +1,10 @@
 import pytest
 import sys
 import os
+from flask import render_template
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from app import app, users_list, products_list
+from app import app, users_list, products_list, place_order, make_order
 
 
 @pytest.fixture
@@ -50,6 +51,17 @@ def test_add_product_route(client):
     assert len(products_list['Електроніка']) == initial_products_count + 1
 
 
-def test_cart_route(client):
-    response = client.get('/cart')
-    assert response.status_code == 200
+def test_place_order(client):
+    with app.test_request_context('/place_order', method='POST', data={'selected_items': ['item1_10', 'item2_20']}):
+        response = place_order()
+        expected_html = render_template('cart.html',
+                                        selected_products=[{'name': 'item1', 'price': 10},
+                                                           {'name': 'item2', 'price': 20}],
+                                        total_price=30)
+        assert response.data == expected_html.encode('utf-8')
+
+
+def test_make_order(client):
+    with app.test_request_context('/make_order', method='POST'):
+        response = make_order()
+        assert response.status_code == 302

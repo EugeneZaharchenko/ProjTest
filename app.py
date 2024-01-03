@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template, redirect, url_for
+from flask import Flask, request, render_template, redirect, url_for, abort, make_response
 
 app = Flask(__name__)
 
@@ -26,29 +26,7 @@ products_list = {
 
 }
 
-goods = []
-
-
-# Роут для оформлення замовлення
-# @app.route("/place_order", methods=["POST"])
-# def place_order():
-#     order_data = request.get_json()
-#     user = order_data["user"]
-#     selected_products = order_data["products"]
-#
-#     # Перевірка наявності товарів та коштів у користувача
-#     for product in selected_products:
-#         if product not in products:
-#             return jsonify({"message": f"Product {product} not available"})
-#     if user["balance"] < sum(product["price"] for product in selected_products):
-#         return jsonify({"message": "Insufficient funds"})
-
-# Оновлення балансу та видалення товарів зі списку наявних
-# user["balance"] -= sum(product["price"] for product in selected_products)
-# for product in selected_products:
-#     products.remove(product)
-#
-# return jsonify({"message": "Order placed successfully"})
+goods_to_buy = []
 
 
 @app.route("/main", methods=["GET"])
@@ -102,11 +80,44 @@ def add_product():
 
         return redirect(url_for('products'))
     get_products_by_category()
+    return render_template("cart.html", goods_to_buy=goods_to_buy)
 
 
-@app.route("/cart", methods=["GET"])
-def cart():
-    return render_template("cart.html", goods=goods)
+# Роут для оформлення замовлення
+@app.route("/place_order", methods=["POST"])
+def place_order():
+    if request.method == 'POST':
+        selected_items = request.form.getlist('selected_items')
+        total_price = 0
+
+        # Retrieve selected items and calculate the total price
+        selected_products = []
+        for item in selected_items:
+            product_name, product_price = item.split('_')
+            product_price = int(product_price)
+            selected_product = {'name': product_name, 'price': product_price}
+            total_price += product_price
+            selected_products.append(selected_product)
+
+        # Add the selected items to the goods list
+        goods_to_buy.extend(selected_products)
+
+        response = make_response(
+            render_template("cart.html", selected_products=selected_products, total_price=total_price))
+
+        return response
+
+    abort(400, "Bad Request: Only POST requests are allowed for this endpoint")
+
+
+@app.route("/make_order", methods=["POST"])
+def make_order():
+    if request.method == 'POST':
+        print('Замовлення сформоване')
+
+        return redirect(url_for('products'))
+
+    abort(400, "Bad Request: Only POST requests are allowed for this endpoint")
 
 
 if __name__ == "__main__":

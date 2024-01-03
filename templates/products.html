@@ -15,11 +15,20 @@
             </select>
         <button class="btn btn-outline-secondary" type="submit">Обрати</button>
         </form>
+
+        <form method="post" action="{{ url_for('place_order') }}">
         <ul class="lead fw-normal">
             {% for product in products %}
-                <li><h4>{{ product.name }} -- {{ product.price }} грн.</h4></li>
+                <li>
+                <input type="checkbox" name="selected_items" value={{ product.name }}_{{ product.price }}>
+                    <h4>{{ product.name }} -- {{ product.price }} грн.</h4>
+                </li>
             {% endfor %}
         </ul>
+
+        <button class="btn btn-info" type="submit">Додати в корзину</button>
+        </form>
+
         <br>
     <h2>Додати нову одиницю товару</h2>
     <form method="post" action="{{ url_for('add_product') }}">

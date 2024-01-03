@@ -1,1 +1,30 @@
 {% extends "main.html" %}
+
+{% block title %}Корзина{% endblock %}
+
+{% block content %}
+    <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-light">
+    <div class="col-md-5 p-lg-5 mx-auto my-5">
+        <h1 class="display-4 fw-normal">Корзина</h1>
+        <h2>Обрані товари:</h2>
+    <ul>
+        {% for product in selected_products %}
+            <li><h4>{{ product['name'] }} - ${{ product['price'] }}</h4></li>
+        {% endfor %}
+    </ul>
+
+    <h4>Загальна вартість: ${{ total_price }}</h4>
+
+    <form method="post" action="{{ url_for('make_order') }}">
+
+        <button class="btn btn-warning" type="submit">Оформити замовлення</button>
+        </form>
+
+    <a href="{{ url_for('products') }}"><h5>Повернутись до товарів</h5></a>
+        <br>
+
+      </div>
+    <div class="product-device shadow-sm d-none d-md-block"></div>
+    <div class="product-device product-device-2 shadow-sm d-none d-md-block"></div>
+  </div>
+{% endblock %}
